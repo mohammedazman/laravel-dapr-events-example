@@ -1,0 +1,9 @@
+{
+    "require": {
+        "dapr/php-sdk": "dev-main",
+        "guzzlehttp/guzzle": "^7.10",
+        "php-di/invoker": "^2.5"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -1,0 +1,153 @@
+version: '3.7'
+
+services:
+  ############################
+  # publisher service
+  ############################
+  publisher_app:
+    container_name: publisher
+    image: webdevops/php-nginx:8.3
+    volumes:
+      - ./publisher:/var/www
+      - ./publisher/docker/nginx/dapr.conf:/opt/docker/etc/nginx/vhost.common.d/10-dapr.conf:ro
+    ports:
+      - "8088:80"     # app http
+      - "3500:3500"   # publisher sidecar http
+    environment:
+      WEB_DOCUMENT_ROOT: /var/www/public
+    networks: [webnet]
+    depends_on:
+      - placement
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+      start_period: 20s
+
+  ############################
+  # consumer service
+  ############################
+  consumer_app:
+    container_name: consumer
+    image: webdevops/php-nginx:8.3
+    volumes:
+      - ./consumer:/var/www
+      - ./consumer/docker/nginx/dapr.conf:/opt/docker/etc/nginx/vhost.common.d/10-dapr.conf:ro
+    ports:
+      - "8080:80"     # app http
+      - "3501:3500"   # consumer sidecar http
+    environment:
+      WEB_DOCUMENT_ROOT: /var/www/public
+    networks: [webnet]
+    depends_on:
+      - placement
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/healthz"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+      start_period: 20s
+
+  ############################
+  # Dapr sidecar for Publisher app
+  ############################
+  publisher-dapr:
+    container_name: publisher-dapr-sidecar
+    image: daprio/daprd:latest
+    command:
+      [
+        "./daprd",
+        "--app-id","publisher",
+        "--app-port","80",
+        "--app-protocol","http",
+        "--resources-path","/components",
+        "--dapr-http-port","3500",
+        "--dapr-grpc-port","50001",
+        "--dapr-listen-addresses","0.0.0.0",
+        "--placement-host-address","placement:50006",
+        "--enable-app-health-check","true",
+      ]
+    volumes:
+      - ./publisher/components/:/components
+    depends_on:
+      publisher_app:
+        condition: service_healthy
+    network_mode: "service:publisher_app"
+    restart: unless-stopped
+
+  ############################
+  # Dapr sidecar for Consumer app
+  ############################
+  consumer-dapr:
+    container_name: consumer-dapr-sidecar
+    image: daprio/daprd:latest
+    command:
+      [
+        "./daprd",
+        "--app-id","consumer",
+        "--app-port","80",
+        "--app-protocol","http",
+        "--resources-path","/components",
+        "--dapr-http-port","3500",
+        "--dapr-grpc-port","50001",
+        "--dapr-listen-addresses","0.0.0.0",
+        "--placement-host-address","placement:50006",
+      ]
+    volumes:
+      - ./consumer/components/:/components
+    depends_on:
+      consumer_app:
+        condition: service_healthy
+    network_mode: "service:consumer_app"
+    restart: unless-stopped
+
+  ############################
+  # Dapr placement (actors)
+  ############################
+  placement:
+    container_name: laravel-dapr
+    image: daprio/dapr:latest
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - 50006:50006
+    networks: [webnet]
+    restart: unless-stopped
+
+  ############################
+  # Redis pubsub service
+  ############################
+  redis:
+    container_name: laravel-redis
+    image: redis
+    ports:
+      - 6380:6379
+    networks: [webnet]
+    restart: unless-stopped
+
+  ############################
+  # Dapr Dashboard
+  ############################
+  dapr-dashboard:
+    image: daprio/dashboard:latest
+    container_name: dapr-dashboard
+    command: [
+      "--docker-compose=true",
+      "--components-path=/home/nonroot/components",
+      "--config-path=/home/nonroot/configuration",
+      "--docker-compose-path=/home/nonroot/docker-compose.yml"
+    ]
+    ports:
+      - "8081:8080"
+    volumes:
+      - "./dapr/components/:/home/nonroot/components"
+      - "./dapr/config/:/home/nonroot/configuration"
+    networks: [webnet]
+    restart: unless-stopped
+
+networks:
+  webnet:
+
+volumes:
+  input_service_data:
+    driver: local
