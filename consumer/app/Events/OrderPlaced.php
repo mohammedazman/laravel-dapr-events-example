@@ -2,7 +2,8 @@
 
 namespace App\Events;
 
-use AlazziAz\DaprEvents\Attributes\Topic;
+
+use AlazziAz\LaravelDapr\Attributes\Topic;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;

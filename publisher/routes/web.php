@@ -15,3 +15,24 @@ Route::get('test/publish', function () {
 
     return 'Event Published!';
 });
+
+Route::get('test/invoke', function () {
+
+
+    $result = \AlazziAz\LaravelDaprInvoker\Facades\DaprInvoke::get(
+        appId: 'consumer',
+        method: 'api/invoked-route',
+        query: [
+            'sampleParam' => 'sampleValue',
+        ],
+    );
+
+//    $result  = $promise->wait();
+    dd($result);
+
+    return response()->json([
+        'status' => 'Invocation Successful',
+        'response' => $result,
+//        'state'=> $promise->getState(),
+    ]);
+});

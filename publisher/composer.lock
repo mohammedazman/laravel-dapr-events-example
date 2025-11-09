@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4f87296bf818e57dedc6daedd07c8433",
+    "content-hash": "5d60dc342513f028dc85c1f4e2dbe79f",
     "packages": [
         {
-            "name": "alazziaz/laravel-dapr-events",
-            "version": "v1.0.1",
+            "name": "alazziaz/laravel-dapr",
+            "version": "v2.0.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/alazzi-az/laravel-dapr-events.git",
-                "reference": "166bb687100c9f2caf4b7008fd6557fb478d3f5b"
+                "url": "https://github.com/alazzi-az/laravel-dapr.git",
+                "reference": "4b20093f653c5a78420ec12c04bfa5283781ca38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alazzi-az/laravel-dapr-events/zipball/166bb687100c9f2caf4b7008fd6557fb478d3f5b",
-                "reference": "166bb687100c9f2caf4b7008fd6557fb478d3f5b",
+                "url": "https://api.github.com/repos/alazzi-az/laravel-dapr/zipball/4b20093f653c5a78420ec12c04bfa5283781ca38",
+                "reference": "4b20093f653c5a78420ec12c04bfa5283781ca38",
                 "shasum": ""
             },
             "require": {
@@ -31,8 +31,12 @@
                 "illuminate/support": "^10.0|^11.0|^12.0",
                 "php": "^8.2"
             },
+            "conflict": {
+                "alazziaz/laravel-dapr-events": "*"
+            },
             "replace": {
                 "alazziaz/laravel-dapr-foundation": "self.version",
+                "alazziaz/laravel-dapr-invoker": "self.version",
                 "alazziaz/laravel-dapr-listener": "self.version",
                 "alazziaz/laravel-dapr-publisher": "self.version"
             },
@@ -48,21 +52,27 @@
             "type": "library",
             "extra": {
                 "laravel": {
+                    "aliases": {
+                        "DaprInvoke": "AlazziAz\\LaravelDaprListener\\Facades\\DaprInvoke"
+                    },
                     "providers": [
-                        "AlazziAz\\DaprEvents\\ServiceProvider",
-                        "AlazziAz\\DaprEventsPublisher\\ServiceProvider",
-                        "AlazziAz\\DaprEventsListener\\ServiceProvider"
+                        "AlazziAz\\LaravelDapr\\ServiceProvider",
+                        "AlazziAz\\LaravelDaprPublisher\\ServiceProvider",
+                        "AlazziAz\\LaravelDaprListener\\ServiceProvider",
+                        "AlazziAz\\LaravelDaprInvoker\\ServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "files": [
-                    "src/Publisher/src/Support/helpers.php"
+                    "src/Publisher/src/Support/helpers.php",
+                    "src/Invoker/src/Support/helpers.php"
                 ],
                 "psr-4": {
-                    "AlazziAz\\DaprEvents\\": "src/Foundation/src/",
-                    "AlazziAz\\DaprEventsListener\\": "src/Listener/src/",
-                    "AlazziAz\\DaprEventsPublisher\\": "src/Publisher/src/"
+                    "AlazziAz\\LaravelDapr\\": "src/Foundation/src/",
+                    "AlazziAz\\LaravelDaprInvoker\\": "src/Invoker/src/",
+                    "AlazziAz\\LaravelDaprListener\\": "src/Listener/src/",
+                    "AlazziAz\\LaravelDaprPublisher\\": "src/Publisher/src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -73,16 +83,17 @@
             "keywords": [
                 "dapr",
                 "events",
+                "invoker",
                 "laravel",
                 "listener",
                 "publisher",
                 "pubsub"
             ],
             "support": {
-                "issues": "https://github.com/alazzi-az/laravel-dapr-events/issues",
-                "source": "https://github.com/alazzi-az/laravel-dapr-events/tree/v1.0.1"
+                "issues": "https://github.com/alazzi-az/laravel-dapr/issues",
+                "source": "https://github.com/alazzi-az/laravel-dapr/tree/v2.0.7"
             },
-            "time": "2025-10-28T19:35:02+00:00"
+            "time": "2025-11-09T02:59:03+00:00"
         },
         {
             "name": "brick/math",
